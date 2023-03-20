@@ -13,13 +13,9 @@ setup(
     install_requires=required,
     include_package_data=True,
     packages=[
-        "brats",
-        "hn",
-        "adni",
         "worclipo",
         "worcliver",
-        "worccrlm",
-        "worcdesmoid",
+        "ecg",
         "worcgist"
     ],
 )
