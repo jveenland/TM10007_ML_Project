@@ -12,6 +12,12 @@ setup(
     author_email="m.starmans@erasmusmc.nl",
     install_requires=required,
     include_package_data=True,
+    package_data={
+        # Include any *.csv files found within the package
+        "worcgist": ['*.csv'], 
+        "worclipo": ['*.csv'], 
+        "worcliver": ['*.csv'], 
+    },
     packages=[
         "worclipo",
         "worcliver",
