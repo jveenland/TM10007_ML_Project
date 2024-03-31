@@ -33,7 +33,7 @@ variances = X_train.var()
 variances_df = pd.DataFrame({'Feature Count': range(1, len(variances) + 1), 'Variance': variances})
 
 # Set threshold
-threshold    = 0.00
+threshold    = 0.015
 low_var_cols = variances[variances < threshold].index
 
 X_train_selected = X_train.drop(columns=low_var_cols)
@@ -44,25 +44,23 @@ print('Amount of features after thresholding:',X_train_selected.shape[1])
 # sns.scatterplot(data=variances_df, x=range(0,X_train.shape[1]), y=variances, color='skyblue')
 # plt.xlabel('Features')
 # plt.ylabel('Variance')
-# plt.axhline(y=threshold, color='b', linestyle='--')
+# plt.axhline(y=threshold, color='skyblue', linestyle='--')
 # plt.show()
 
-
-## Perform PCA
-p = PCA() 
-p = p.fit(X_train_selected)
-X_train_selected = p.transform(X_train_selected)
-
-## RFE
-# Create the RFE object and compute a cross-validated score.
+## Perform RFE
+# Instantiate an estimator
 svc = svm.SVC(kernel="linear")
 
-# classifications
+# Instantiate RFECV
 rfecv = feature_selection.RFECV(
-    estimator=svc, step=10,
+    estimator=svc, step=1,
     cv=model_selection.StratifiedKFold(4),
     scoring='roc_auc')
 rfecv.fit(X_train_selected, y_train)
+
+# Select Features
+selected_features = rfecv.feature_names_in_
+print('Amount of features after RFE',selected_features.shape[0])
 
 # Plot number of features VS. cross-validation scores
 plt.figure()
