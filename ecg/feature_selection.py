@@ -4,10 +4,12 @@ import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
 
-# Classifiers
+# SKlearn imports
 from sklearn import model_selection
 from sklearn.decomposition import PCA
 from sklearn.preprocessing import MinMaxScaler
+from sklearn import svm
+from sklearn import feature_selection
 
 ## Preparing data
 # Load and extract data
@@ -31,7 +33,7 @@ variances = X_train.var()
 variances_df = pd.DataFrame({'Feature Count': range(1, len(variances) + 1), 'Variance': variances})
 
 # Set threshold
-threshold    = 0.015
+threshold    = 0.00
 low_var_cols = variances[variances < threshold].index
 
 X_train_selected = X_train.drop(columns=low_var_cols)
@@ -39,11 +41,11 @@ X_train_selected = X_train.drop(columns=low_var_cols)
 print('Amount of features after thresholding:',X_train_selected.shape[1])
 
 # Plot histogram of variances
-sns.scatterplot(data=variances_df, x=range(0,X_train.shape[1]), y=variances, color='skyblue')
-plt.xlabel('Features')
-plt.ylabel('Variance')
-plt.axhline(y=threshold, color='b', linestyle='--')
-plt.show()
+# sns.scatterplot(data=variances_df, x=range(0,X_train.shape[1]), y=variances, color='skyblue')
+# plt.xlabel('Features')
+# plt.ylabel('Variance')
+# plt.axhline(y=threshold, color='b', linestyle='--')
+# plt.show()
 
 
 ## Perform PCA
@@ -51,3 +53,20 @@ p = PCA()
 p = p.fit(X_train_selected)
 X_train_selected = p.transform(X_train_selected)
 
+## RFE
+# Create the RFE object and compute a cross-validated score.
+svc = svm.SVC(kernel="linear")
+
+# classifications
+rfecv = feature_selection.RFECV(
+    estimator=svc, step=10,
+    cv=model_selection.StratifiedKFold(4),
+    scoring='roc_auc')
+rfecv.fit(X_train_selected, y_train)
+
+# Plot number of features VS. cross-validation scores
+plt.figure()
+plt.xlabel("Number of features selected")
+plt.ylabel("Cross validation score (nb of correct classifications)")
+plt.plot(range(1, len(rfecv.cv_results_["mean_test_score"]) + 1), rfecv.cv_results_["mean_test_score"])
+plt.show()
