@@ -9,19 +9,9 @@ def load_data():
     return data
 
 def extract_data(input_data):
-    ## Creating feature list for each patient (X) and truth list (Y) 
-    # Convert dataframe to list for each row
-    data_list = [row.tolist() for _, row in input_data.iterrows()]
+    # Create variable Y 
+    Y = input_data['label']
 
-    # Extract last row from data list as truth Y
-    Y = []
-    for row in data_list:
-        Y.append(row[-1])    
-    Y = np.array(Y)
-
-    # Remove last column (truth) and create X
-    for row in data_list:
-        del row[-1]
-    X = data_list
-    X = np.array(X)
+    # Create variable X
+    X = input_data.drop('label', axis=1)
     return X, Y

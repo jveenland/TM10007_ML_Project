@@ -1,5 +1,8 @@
 import load_data
 import numpy as np
+import pandas as pd
+import seaborn as sns
+import matplotlib.pyplot as plt
 
 # Classifiers
 from sklearn.naive_bayes import GaussianNB
@@ -12,22 +15,27 @@ from sklearn.neighbors import KNeighborsClassifier
 from sklearn import model_selection
 from sklearn import metrics
 from sklearn.decomposition import PCA
+from sklearn import feature_selection
+from sklearn import preprocessing
+from sklearn import neighbors
+from sklearn import svm
+from sklearn.preprocessing import MinMaxScaler
 
+## Preparing data
 # Load and extract data
 data = load_data.load_data()
 X,y  = load_data.extract_data(data)
 
-# Perform PCA
-p = PCA(n_components=X.shape[1]) # Hier gebruik ik nu het aantal kollomen als n_components, maar vgm klopt dat dus niet
-p = p.fit(X)
-X = p.transform(X)
+# Scaling data 
+scaler  = MinMaxScaler()
+X_scaled = scaler.fit_transform(X)
+
+# Convert scaled data back to DataFrame
+X_scaled = pd.DataFrame(X_scaled, columns=X.columns)
 
 # Split the dataset in train and test part
-X_train, X_test, y_train, y_test = model_selection.train_test_split(X, y, test_size=0.5, stratify=y)
+X_train, X_test, y_train, y_test = model_selection.train_test_split(X_scaled, y, test_size=0.2, stratify=y, random_state=42)
 
-# ## Classification
-# lda = LinearDiscriminantAnalysis()
-# lda = lda.fit(X_train, y_train)
-# y_pred = lda.predict(X_train)
 
-# print("Number of mislabeled points out of a total %d points : %d" % (X_train.shape[0], (y_train != y_pred).sum()))
+
+
